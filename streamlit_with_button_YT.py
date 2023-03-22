@@ -47,14 +47,9 @@ def transforming_features(track_id):
     df_new_song=pd.DataFrame(au_features)    
     
     df_new_song_features=df_new_song[['danceability', 'energy', 'loudness','speechiness', 'acousticness', 'instrumentalness', 'liveness','valence', 'tempo']]
-    scaller_try = load("Model_final/scaler_7.pickle")
+    scaller_try = load("Model_final/scaler_8k_songs.pickle")
     scaled_new_song = scaller_try.transform(df_new_song_features)
-    #df_new_song
-# Loading the Stabdardscaler
-    #df_for_scalling = df_new_song[['danceability', 'energy', 'loudness',  'speechiness',   'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo']]
-    #df_for_clustering = scaled_new_song[['danceability', 'energy', 'key', 'loudness', 'mode', 'speechiness', 'acousticness', 'instrumentalness', 'liveness','valence', 'tempo']]
-    cluster_new = load("Model_final/kmeans80_9features_of130k.pickle")
-    #cluster_new_song = cluster_new.transform(df_for_clustering)
+    cluster_new = load("Model_final/kmeans_11clusters_8k.pickle")
     k_num=cluster_new.predict(scaled_new_song)
 
     return k_num
@@ -65,7 +60,7 @@ def random_song_selection(k_num):
 #output: selection of 5 songs
 # import df of songs, with cluster columns assigned
 #
-    df=pd.read_csv('library_cluster_80_130k_9featur.csv', index_col=[0])
+    df=pd.read_csv('library_cluster_11_8ksongs_9featur.csv', index_col=[0])
     df_by_k=df.loc[df['clusters']==k_num[0]] 
     df_by_k_list=df_by_k['id'].to_list()
     df_by_k_list=list(set(df_by_k_list))
@@ -77,7 +72,7 @@ def random_song_selection(k_num):
 
 st.set_page_config(page_title="Music",page_icon="🎵",initial_sidebar_state="expanded")
 
-df = pd.read_csv('library_cluster_80_130k_9featur.csv', index_col=0)
+df = pd.read_csv('library_cluster_11_8ksongs_9featur.csv', index_col=0)
 
 def update_params():
     st.experimental_set_query_params(song=st.session_state.qp)
@@ -138,7 +133,9 @@ try:
     
     elif display == "Recommendations":
         k_num=transforming_features(track_id)
+        st.write(k_num)
         song_selection=random_song_selection(k_num)
+        st.write(song_selection)
         for ele in song_selection:
             src="https://open.spotify.com/embed/track/"+ele+"?utm_source=generator"
             components.iframe(src, height=300)

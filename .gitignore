@@ -1,3 +1,5 @@
 config.py
 __pycache__
 .cache
+Model_final/
+Csv_files/
